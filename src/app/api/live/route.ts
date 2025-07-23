@@ -1,9 +1,8 @@
 // src/app/api/live/route.ts
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route"; // Ruta relativa (correcta para este nivel)
-// ¡IMPORTACIÓN CORREGIDA CON ALIAS!
-import { query } from '@/utils/dbService';
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // RUTA CORREGIDA CON ALIAS
+import { query } from '@/utils/dbService'; // ¡IMPORTACIÓN CORREGIDA CON ALIAS!
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
