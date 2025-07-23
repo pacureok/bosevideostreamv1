@@ -68,14 +68,15 @@ export default function CreatorLayout({
     if (!isLoading) { // Solo redirige si ya terminamos de cargar
       // Si no está autenticado O no es creador, redirige a /login
       // También evita la redirección si ya estamos en la página de login
-      if ((!isAuthenticated || !isCreator) && router.pathname !== "/login") {
+      // CAMBIO AQUÍ: router.pathname A router.asPath
+      if ((!isAuthenticated || !isCreator) && router.asPath !== "/login") {
         router.push("/login");
       }
     }
   }, [isLoading, isAuthenticated, isCreator, router]);
 
 
-  if (isLoading || (!isAuthenticated && !isCreator && router.pathname !== "/login")) {
+  if (isLoading || (!isAuthenticated && !isCreator && router.asPath !== "/login")) {
     // Muestra un loader mientras se verifica la sesión o antes de la redirección
     // Muestra el loader solo si no estamos ya en la página de login
     return (
