@@ -1,25 +1,12 @@
+// src/app/api/streamer-info/route.ts
 import { NextResponse } from 'next/server';
-// RUTA CORREGIDA: Subir 3 niveles para llegar a src, luego ir a utils 
-import { query } from '../../../utils/dbService';
-import jwt from 'jsonwebtoken';
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route"; // Ruta relativa (correcta para este nivel)
+// ¡IMPORTACIÓN CORREGIDA CON ALIAS!
+import { query } from '@/utils/dbService';
 
-async function getSessionFromRequest(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-  const token = authHeader.split(' ')[1];
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as { id: string; isCreator: boolean; name: string; username: string; };
-    return { user: { id: decoded.id, isCreator: decoded.isCreator, name: decoded.username } };
-  } catch (error) {
-    console.error("Error validating JWT in streamer-info function:", error);
-    return null;
-  }
-}
-
-export async function GET(request: Request) {
-  const session = await getSessionFromRequest(request);
+export async function GET(req: Request) {
+  const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ message: 'No autenticado.' }, { status: 401 });
   }
@@ -37,21 +24,21 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'Usuario no encontrado.' }, { status: 404 });
     }
 
-    return NextResponse.json(user, { status: 200 });
+    return NextResponse.json(user);
   } catch (error) {
     console.error('Error al obtener información del streamer:', error);
     return NextResponse.json({ message: 'Error interno del servidor.' }, { status: 500 });
   }
 }
 
-export async function PUT(request: Request) {
-  const session = await getSessionFromRequest(request);
+export async function PUT(req: Request) {
+  const session = await getServerSession(authOptions);
   if (!session || !session.user?.isCreator) {
     return NextResponse.json({ message: 'No autorizado.' }, { status: 403 });
   }
 
   try {
-    const { youtubeUrl, isLive } = await request.json();
+    const { youtubeUrl, isLive } = await req.json();
     const userId = session.user?.id;
 
     if (!userId) {
@@ -80,7 +67,7 @@ export async function PUT(request: Request) {
     const updateQuery = `UPDATE users SET ${updates.join(', ')} WHERE id = $${paramIndex}`;
     await query(updateQuery, params);
 
-    return NextResponse.json({ message: 'Información del streamer actualizada.' }, { status: 200 });
+    return NextResponse.json({ message: 'Información del streamer actualizada.' });
   } catch (error) {
     console.error('Error al actualizar información del streamer:', error);
     return NextResponse.json({ message: 'Error interno del servidor.' }, { status: 500 });
