@@ -2,7 +2,9 @@
 import React from 'react';
 import Link from 'next/link';
 
-// Este es un Server Component. NO debe usar 'use client' ni hooks de React como useState, useEffect, useSession, etc.
+// ESTE ES UN SERVER COMPONENT PURO.
+// NO DEBE TENER 'use client' EN LA PRIMERA LÍNEA.
+// NO DEBE USAR HOOKS DE REACT COMO useState, useEffect, useSession, etc.
 // La autenticación y redirección para proteger esta ruta se maneja en src/app/creator/layout.tsx.
 
 export default function CreatorDashboardPage() {
