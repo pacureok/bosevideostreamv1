@@ -1,20 +1,29 @@
-import { NextResponse } from 'next/server';
-import { hashPassword } from '../../../utils/authService';
-import { query } from '../../../utils/dbService';
+// netlify/functions/register.ts
+import { Handler } from '@netlify/functions'; // Importa el tipo Handler de Netlify Functions
+import { hashPassword } from '../../src/utils/authService'; // Ruta corregida
+import { query } from '../../src/utils/dbService';     // Ruta corregida
 
-export async function POST(request: Request) {
-  console.log('Function register invoked!'); // Log de inicio de la función
+// Define la función handler para Netlify Lambda
+export const handler: Handler = async (event) => {
+  console.log('Register function invoked!'); // Log de inicio
+
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ message: 'Método no soportado.' })
+    };
+  }
 
   try {
-    // Log para verificar si las variables de entorno son accesibles
-    console.log('DATABASE_URL length:', process.env.DATABASE_URL?.length || 'undefined');
-    console.log('Attempting to parse request body...');
-
-    const { username, email, password } = await request.json();
+    // Parsear el cuerpo de la solicitud
+    const { username, email, password } = JSON.parse(event.body || '{}');
 
     if (!username || !email || !password) {
       console.log('Missing username, email, or password.');
-      return NextResponse.json({ message: 'Todos los campos son requeridos.' }, { status: 400 });
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: 'Todos los campos son requeridos.' })
+      };
     }
 
     console.log(`Attempting to register user: ${username}, ${email}`);
@@ -22,7 +31,10 @@ export async function POST(request: Request) {
     const userExists = await query("SELECT id FROM users WHERE username = $1 OR email = $2", [username, email]);
     if (userExists.rows.length > 0) {
       console.log('User or email already registered.');
-      return NextResponse.json({ message: 'El usuario o email ya está registrado.' }, { status: 409 });
+      return {
+        statusCode: 409,
+        body: JSON.stringify({ message: 'El usuario o email ya está registrado.' })
+      };
     }
 
     const hashedPassword = await hashPassword(password);
@@ -34,14 +46,19 @@ export async function POST(request: Request) {
     );
 
     console.log('User registered successfully!');
-    return NextResponse.json({ message: 'Registro exitoso.' }, { status: 201 });
-  } catch (error: any) { // Captura el error para loggearlo
-    console.error('Error during registration process:', error);
-    // Intenta loggear el mensaje de error si existe
+    return {
+      statusCode: 201,
+      body: JSON.stringify({ message: 'Registro exitoso.' })
+    };
+  } catch (error: any) {
+    console.error('Error during registration:', error);
     if (error instanceof Error) {
       console.error('Error message:', error.message);
       console.error('Error stack:', error.stack);
     }
-    return NextResponse.json({ message: 'Error interno del servidor.' }, { status: 500 });
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: 'Error interno del servidor.' })
+    };
   }
-}
+};
