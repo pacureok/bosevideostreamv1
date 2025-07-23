@@ -1,48 +1,52 @@
-// src/app/
-'use client'; // Marca este componente como un componente de cliente
+// src/app/register/page.tsx
+'use client'; // Componente de cliente
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react'; // Opcional: para iniciar sesión automáticamente después del registro
 
 export default function RegisterPage() {
-  // Estados para los campos del formulario y mensajes de error/éxito
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const router = useRouter(); // Hook para la navegación
+  const router = useRouter();
 
-  // Manejador de envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Previene el comportamiento por defecto del formulario
-    setError(''); // Limpia errores anteriores
-    setSuccess(''); // Limpia mensajes de éxito anteriores
+    e.preventDefault();
+    setError('');
+    setSuccess('');
 
     try {
-      // Realiza una solicitud POST a tu API de registro
-      // Netlify redirigirá '/api/register' a tu función Lambda 'netlify/functions/register.ts'
+      // Llama a tu API de registro (ruta API de Next.js)
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password }), // Envía los datos en formato JSON
+        body: JSON.stringify({ username, email, password }),
       });
 
       if (!response.ok) {
-        // Si la respuesta no es exitosa (ej. 400, 409, 500)
         const errData = await response.json();
         setError(errData.message || 'Error al registrar usuario. Inténtalo de nuevo.');
         return;
       }
 
-      // Si la respuesta es exitosa
       setSuccess('¡Registro exitoso! Redirigiendo a la página de inicio de sesión...');
-      // Redirige al usuario a la página de inicio de sesión después de un breve retraso
-      router.push('/login');
+      // Opcional: Iniciar sesión automáticamente después del registro
+      // const signInResult = await signIn('credentials', {
+      //   redirect: false,
+      //   username,
+      //   password,
+      // });
+      // if (signInResult?.error) {
+      //   console.error('Error al iniciar sesión automáticamente:', signInResult.error);
+      // }
+
+      router.push('/login'); // Redirige a la página de inicio de sesión
     } catch (err) {
-      // Captura cualquier error de red o del servidor
       console.error('Error en el registro:', err);
       setError('Error de red o del servidor. Por favor, inténtalo de nuevo más tarde.');
     }
@@ -53,11 +57,9 @@ export default function RegisterPage() {
       <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-green-400 mb-6 text-center">Registrarse</h2>
 
-        {/* Muestra mensajes de error o éxito */}
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
         {success && <p className="text-green-500 text-center mb-4">{success}</p>}
 
-        {/* Campo de Nombre de Usuario */}
         <div className="mb-4">
           <label htmlFor="username" className="block text-gray-300 text-sm font-bold mb-2">Usuario:</label>
           <input
@@ -71,7 +73,6 @@ export default function RegisterPage() {
           />
         </div>
 
-        {/* Campo de Correo Electrónico */}
         <div className="mb-4">
           <label htmlFor="email" className="block text-gray-300 text-sm font-bold mb-2">Correo Electrónico:</label>
           <input
@@ -85,13 +86,12 @@ export default function RegisterPage() {
           />
         </div>
 
-        {/* Campo de Contraseña */}
         <div className="mb-6">
           <label htmlFor="password" className="block text-gray-300 text-sm font-bold mb-2">Contraseña:</label>
           <input
             type="password"
             id="password"
-            className="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-900 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-700 border-gray-600 placeholder-gray-400"
+            className="p-2 mb-4 rounded-md border border-gray-600 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Crea una contraseña segura"
@@ -99,7 +99,6 @@ export default function RegisterPage() {
           />
         </div>
 
-        {/* Botón de Registro */}
         <div className="flex items-center justify-between">
           <button
             type="submit"
@@ -109,7 +108,6 @@ export default function RegisterPage() {
           </button>
         </div>
 
-        {/* Enlace a la página de inicio de sesión */}
         <p className="text-center text-gray-400 text-sm mt-6">
           ¿Ya tienes una cuenta?{' '}
           <a href="/login" className="text-green-400 hover:underline font-bold">Inicia sesión aquí</a>
