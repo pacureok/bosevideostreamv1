@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
-import { SessionProvider } from "next-auth/react";
-import React from "react";
+import "./globals.css"; // Asegúrate de que tus estilos globales estén aquí
+import React from "react"; // Importa React
+import Providers from "./providers"; // ¡IMPORTA EL COMPONENTE CLIENTE Providers!
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,10 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* Provee la sesión a toda la app */}
-        <SessionProvider>
+        {/* Envuelve toda la aplicación con el componente Providers (que es de cliente) */}
+        <Providers>
           {children}
-        </SessionProvider>
+        </Providers>
       </body>
     </html>
   );
