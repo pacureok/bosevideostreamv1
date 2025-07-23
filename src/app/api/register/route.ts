@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
-// ¡IMPORTACIONES CORREGIDAS CON ALIAS!
-import { hashPassword } from '@/utils/authService';
-import { query } from '@/utils/dbService';
+import { hashPassword } from '@/utils/authService'; // ¡IMPORTACIÓN CORREGIDA CON ALIAS!
+import { query } from '@/utils/dbService';     // ¡IMPORTACIÓN CORREGIDA CON ALIAS!
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { username, email, password } = await req.json();
+    const { username, email, password } = await request.json();
 
     if (!username || !email || !password) {
       return NextResponse.json({ message: 'Todos los campos son requeridos.' }, { status: 400 });
@@ -24,13 +23,7 @@ export async function POST(req: Request) {
     );
 
     return NextResponse.json({ message: 'Registro exitoso.' }, { status: 201 });
-  } catch (error) {
-    console.error('Error durante el registro:', error);
-    return NextResponse.json({ message: 'Error interno del servidor.' }, { status: 500 });
-  }
-}
-
-  } catch (error) {
+  } catch (error) { // Asegúrate de que no haya un '}' extra aquí o antes.
     console.error('Error durante el registro:', error);
     return NextResponse.json({ message: 'Error interno del servidor.' }, { status: 500 });
   }
