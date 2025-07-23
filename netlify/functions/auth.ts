@@ -1,16 +1,15 @@
 // netlify/functions/auth.ts
-// Este archivo maneja la lógica de inicio de sesión para Netlify Functions.
-// NO es una ruta API de Next.js, sino una función Lambda que maneja el login y genera un JWT.
+import { Handler } from '@netlify/functions'; // Importa el tipo Handler de Netlify Functions
+import { comparePassword } from '../../src/utils/authService'; // Ruta corregida
+import { query } from '../../src/utils/dbService';     // Ruta corregida
+import jwt from 'jsonwebtoken';
 
-import { comparePassword } from "../../src/utils/authService"; // Ruta relativa a authService
-import { query } from "../../src/utils/dbService";     // Ruta relativa a dbService
-import jwt from 'jsonwebtoken'; // Necesitarás instalar 'jsonwebtoken' (npm install jsonwebtoken)
-
-// ¡IMPORTANTE! Define esta variable de entorno en Netlify.
-// Debe ser una cadena larga y aleatoria para firmar tus JWTs.
 const JWT_SECRET = process.env.JWT_SECRET!;
 
-export async function handler(event: any) {
+// Define la función handler para Netlify Lambda
+export const handler: Handler = async (event) => {
+  console.log('Auth function invoked!'); // Log de inicio
+
   // Solo permitimos solicitudes POST para el inicio de sesión
   if (event.httpMethod !== 'POST') {
     return {
@@ -20,13 +19,18 @@ export async function handler(event: any) {
   }
 
   try {
+    // Parsear el cuerpo de la solicitud (viene como string en event.body)
     const { username, password } = JSON.parse(event.body || '{}');
+
     if (!username || !password) {
+      console.log('Missing username or password.');
       return {
         statusCode: 400,
         body: JSON.stringify({ message: 'Username y password requeridos' }),
       };
     }
+
+    console.log(`Attempting login for user: ${username}`);
 
     // Consulta la base de datos para encontrar al usuario por su nombre de usuario.
     const userRes = await query("SELECT id, username, password, is_creator FROM users WHERE username = $1", [username]);
@@ -34,6 +38,7 @@ export async function handler(event: any) {
 
     // Verifica si el usuario existe y si la contraseña es correcta.
     if (!user || !(await comparePassword(password, user.password))) {
+      console.log('Invalid credentials.');
       return {
         statusCode: 401,
         body: JSON.stringify({ message: 'Credenciales incorrectas' }),
@@ -41,13 +46,13 @@ export async function handler(event: any) {
     }
 
     // Genera un JSON Web Token (JWT) con la información del usuario.
-    // Este token será enviado al cliente y usado para autenticar futuras solicitudes.
     const token = jwt.sign(
       { id: user.id, username: user.username, isCreator: user.is_creator },
       JWT_SECRET,
       { expiresIn: '7d' } // El token expirará en 7 días
     );
 
+    console.log('Login successful, JWT issued.');
     // Devuelve el token en el cuerpo de la respuesta.
     return {
       statusCode: 200,
@@ -56,11 +61,15 @@ export async function handler(event: any) {
         'Content-Type': 'application/json'
       }
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error autenticando usuario:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     return {
       statusCode: 500,
       body: JSON.stringify({ message: 'Error interno del servidor.' }),
     };
   }
-}
+};
