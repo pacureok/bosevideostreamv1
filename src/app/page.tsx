@@ -1,3 +1,6 @@
+// src/app/page.tsx
+'use client'; // ¡ESTO ES ABSOLUTAMENTE CRÍTICO Y DEBE SER LA PRIMERA LÍNEA!
+
 import React from 'react';
 import Link from 'next/link';
 
