@@ -1,21 +1,20 @@
-[build]
-  command = "npm run build"
-  publish = ".next"
+    [build]
+      command = "npm run build"
+      publish = ".next"
 
-# Configuración para Next.js con rutas API
-# Estas redirecciones son cruciales para que Netlify dirija las peticiones /api/*
-# a las funciones Lambda generadas por Next.js.
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/next_api_handler/:splat"
-  status = 200
+    # Estas redirecciones son cruciales para que Netlify dirija las peticiones /api/*
+    # a las funciones Lambda generadas por Next.js.
+    [[redirects]]
+      from = "/api/*"
+      to = "/.netlify/functions/next_api_handler/:splat"
+      status = 200
 
-[[redirects]]
-  from = "/_next/image"
-  to = "/.netlify/functions/next_image_handler"
-  status = 200
+    [[redirects]]
+      from = "/_next/image"
+      to = "/.netlify/functions/next_image_handler"
+      status = 200
 
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/next_handler"
-  status = 200
+    [[redirects]]
+      from = "/*"
+      to = "/.netlify/functions/next_handler"
+      status = 200
