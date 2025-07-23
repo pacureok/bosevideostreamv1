@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-// RUTA CORREGIDA: Subir 3 niveles para llegar a src, luego ir a utils 
-import { hashPassword } from '../../../utils/authService';
-import { query } from '../../../utils/dbService';
+// ¡IMPORTACIONES CORREGIDAS CON ALIAS!
+import { hashPassword } from '@/utils/authService';
+import { query } from '@/utils/dbService';
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { username, email, password } = await request.json();
+    const { username, email, password } = await req.json();
 
     if (!username || !email || !password) {
       return NextResponse.json({ message: 'Todos los campos son requeridos.' }, { status: 400 });
@@ -24,6 +24,12 @@ export async function POST(request: Request) {
     );
 
     return NextResponse.json({ message: 'Registro exitoso.' }, { status: 201 });
+  } catch (error) {
+    console.error('Error durante el registro:', error);
+    return NextResponse.json({ message: 'Error interno del servidor.' }, { status: 500 });
+  }
+}
+
   } catch (error) {
     console.error('Error durante el registro:', error);
     return NextResponse.json({ message: 'Error interno del servidor.' }, { status: 500 });
