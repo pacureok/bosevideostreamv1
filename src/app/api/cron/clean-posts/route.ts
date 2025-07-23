@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-// ¡IMPORTACIÓN CORREGIDA CON ALIAS!
-import { query } from '@/utils/dbService';
+import { query } from '@/utils/dbService'; // ¡IMPORTACIÓN CORREGIDA CON ALIAS!
 
 export async function GET(req: Request) {
   try {
