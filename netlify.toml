@@ -1,0 +1,9 @@
+    [build]
+      command = "npm run build"
+      publish = ".next"
+
+    [functions]
+      directory = "netlify/functions"
+      # Puedes descomentar la siguiente línea si tienes problemas con la compilación de funciones TypeScript
+      # node_bundler = "esbuild"
+    
