@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-// RUTA CORREGIDA: Subir 3 niveles para llegar a src, luego ir a utils
+// RUTA CORREGIDA: Subir 3 niveles para llegar a src, luego ir a utils 
 import { hashPassword } from '../../../utils/authService';
 import { query } from '../../../utils/dbService';
 
