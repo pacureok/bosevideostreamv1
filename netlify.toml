@@ -18,3 +18,4 @@
       from = "/*"
       to = "/.netlify/functions/next_handler"
       status = 200
+    
