@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../api/auth/[...nextauth]/route"; // Ruta relativa (correcta para este nivel)
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // RUTA CORREGIDA CON ALIAS
 import { redirect } from "next/navigation";
-import React from "react";
+import React from "react"; // Asegúrate de importar React
 
 export default async function CreatorLayout({
   children,
@@ -37,9 +37,4 @@ export default async function CreatorLayout({
       </footer>
     </div>
   );
-}
-    );
-  }
-
-  return null; // Don't render anything if conditions are not met and redirection is in progress
 }
